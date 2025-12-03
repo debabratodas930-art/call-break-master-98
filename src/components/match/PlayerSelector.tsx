@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Check, User } from "lucide-react";
-import { Player } from "@/lib/db";
+import { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface PlayerSelectorProps {
@@ -17,10 +17,10 @@ export const PlayerSelector = ({
   maxPlayers = 4,
 }: PlayerSelectorProps) => {
   const isSelected = (player: Player) => 
-    selectedPlayers.some(p => p.id === player.id);
+    selectedPlayers.some(p => p._id === player._id);
   
   const selectionIndex = (player: Player) => 
-    selectedPlayers.findIndex(p => p.id === player.id) + 1;
+    selectedPlayers.findIndex(p => p._id === player._id) + 1;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -31,7 +31,7 @@ export const PlayerSelector = ({
 
         return (
           <motion.button
-            key={player.id}
+            key={player._id}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.05 }}

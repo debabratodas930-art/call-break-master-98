@@ -1,21 +1,21 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useLiveQuery } from "dexie-react-hooks";
 import { Play, Users, Trophy, History, Spade, Heart, Diamond, Club } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { db } from "@/lib/db";
+import { usePlayers } from "@/hooks/use-players";
+import { useMatches } from "@/hooks/use-matches";
 
 const Index = () => {
-  const players = useLiveQuery(() => db.players.count());
-  const matches = useLiveQuery(() => db.matches.count());
-  const topPlayer = useLiveQuery(() => 
-    db.players.orderBy('rating').reverse().first()
-  );
+  const { data: players } = usePlayers();
+  const { data: matches } = useMatches();
+  
+  const topPlayer = players?.sort((a, b) => b.rating - a.rating)[0];
+  const completedMatches = matches?.filter(m => m.completed) ?? [];
 
   const stats = [
-    { label: "Players", value: players ?? 0, icon: Users },
-    { label: "Matches", value: matches ?? 0, icon: History },
+    { label: "Players", value: players?.length ?? 0, icon: Users },
+    { label: "Matches", value: completedMatches.length, icon: History },
     { label: "Top Rating", value: topPlayer?.rating ?? 1000, icon: Trophy },
   ];
 
@@ -95,7 +95,7 @@ const Index = () => {
         transition={{ delay: 0.3, duration: 0.5 }}
         className="grid grid-cols-3 gap-4 mb-12"
       >
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <div

@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { Player, calculateRoundScore } from "@/lib/db";
+import { Player, calculateRoundScore } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface ScoreInputProps {
   roundNumber: number;
   players: Player[];
-  scores: { playerId: number; bid: number; tricks: number }[];
-  onScoreChange: (playerId: number, field: "bid" | "tricks", value: number) => void;
+  scores: { playerId: string; bid: number; tricks: number }[];
+  onScoreChange: (playerId: string, field: "bid" | "tricks", value: number) => void;
 }
 
 export const ScoreInput = ({
@@ -16,7 +16,7 @@ export const ScoreInput = ({
   scores,
   onScoreChange,
 }: ScoreInputProps) => {
-  const getPlayerScore = (playerId: number) => {
+  const getPlayerScore = (playerId: string) => {
     return scores.find(s => s.playerId === playerId) || { bid: 0, tricks: 0 };
   };
 
@@ -35,13 +35,13 @@ export const ScoreInput = ({
 
       <div className="space-y-3">
         {players.map((player, index) => {
-          const score = getPlayerScore(player.id!);
+          const score = getPlayerScore(player._id!);
           const points = calculateRoundScore(score.bid, score.tricks);
           const isPositive = points >= 0;
 
           return (
             <div
-              key={player.id}
+              key={player._id}
               className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg"
             >
               <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold font-bold text-sm">
@@ -62,7 +62,7 @@ export const ScoreInput = ({
                     value={score.bid || ""}
                     onChange={(e) => {
                       const value = Math.min(13, Math.max(0, parseInt(e.target.value) || 0));
-                      onScoreChange(player.id!, "bid", value);
+                      onScoreChange(player._id!, "bid", value);
                     }}
                     className="w-16 h-9 text-center"
                   />
@@ -77,7 +77,7 @@ export const ScoreInput = ({
                     value={score.tricks || ""}
                     onChange={(e) => {
                       const value = Math.min(13, Math.max(0, parseInt(e.target.value) || 0));
-                      onScoreChange(player.id!, "tricks", value);
+                      onScoreChange(player._id!, "tricks", value);
                     }}
                     className="w-16 h-9 text-center"
                   />
