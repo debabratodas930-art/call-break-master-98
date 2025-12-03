@@ -1,4 +1,3 @@
-import { useLiveQuery } from "dexie-react-hooks";
 import { motion } from "framer-motion";
 import { History as HistoryIcon } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
@@ -6,9 +5,7 @@ import { MatchHistoryCard } from "@/components/history/MatchHistoryCard";
 import { useMatches } from "@/hooks/use-matches";
 
 const History = () => {
-  const matches = useLiveQuery(() => 
-    db.matches.orderBy('timestamp').reverse().toArray()
-  );
+  const { data: matches, isLoading } = useMatches();
 
   const completedMatches = matches?.filter(m => m.completed) ?? [];
 
@@ -29,11 +26,15 @@ const History = () => {
           </p>
         </div>
 
-        {completedMatches.length > 0 ? (
+        {isLoading ? (
+          <div className="card-surface rounded-xl p-12 text-center">
+            <p className="text-muted-foreground">Loading matches...</p>
+          </div>
+        ) : completedMatches.length > 0 ? (
           <div className="space-y-4">
             {completedMatches.map((match, index) => (
               <MatchHistoryCard
-                key={match.id}
+                key={match._id}
                 match={match}
                 index={index}
               />
