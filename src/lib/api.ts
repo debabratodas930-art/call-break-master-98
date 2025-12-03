@@ -1,7 +1,7 @@
 import { Player, Match } from './types';
 
-// Change this to your deployed Express server URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Deployed Express server URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://call-break-master-98.onrender.com/api';
 
 class ApiClient {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
