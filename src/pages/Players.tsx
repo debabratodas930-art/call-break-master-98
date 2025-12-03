@@ -1,19 +1,17 @@
-import { useLiveQuery } from "dexie-react-hooks";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { PlayerCard } from "@/components/players/PlayerCard";
 import { AddPlayerForm } from "@/components/players/AddPlayerForm";
-import { db, deletePlayer } from "@/lib/db";
+import { usePlayers, useDeletePlayer } from "@/hooks/use-players";
 import { toast } from "@/hooks/use-toast";
 
 const Players = () => {
-  const players = useLiveQuery(() => 
-    db.players.orderBy('rating').reverse().toArray()
-  );
+  const { data: players, isLoading } = usePlayers();
+  const deletePlayerMutation = useDeletePlayer();
 
-  const handleDeletePlayer = async (id: number) => {
-    const player = players?.find(p => p.id === id);
+  const handleDeletePlayer = async (id: string) => {
+    const player = players?.find(p => p._id === id);
     if (!player) return;
 
     if (player.matchesPlayed > 0) {
@@ -26,7 +24,7 @@ const Players = () => {
     }
 
     try {
-      await deletePlayer(id);
+      await deletePlayerMutation.mutateAsync(id);
       toast({
         title: "Player removed",
         description: `${player.name} has been removed from the roster`,
@@ -40,9 +38,7 @@ const Players = () => {
     }
   };
 
-  const refreshPlayers = () => {
-    // Dexie live query will auto-refresh
-  };
+  const sortedPlayers = players?.sort((a, b) => b.rating - a.rating) ?? [];
 
   return (
     <Layout>
@@ -62,14 +58,18 @@ const Players = () => {
         </div>
 
         <div className="mb-8">
-          <AddPlayerForm onPlayerAdded={refreshPlayers} />
+          <AddPlayerForm />
         </div>
 
-        {players && players.length > 0 ? (
+        {isLoading ? (
+          <div className="card-surface rounded-xl p-12 text-center">
+            <p className="text-muted-foreground">Loading players...</p>
+          </div>
+        ) : sortedPlayers.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-4">
-            {players.map((player, index) => (
+            {sortedPlayers.map((player, index) => (
               <PlayerCard
-                key={player.id}
+                key={player._id}
                 player={player}
                 rank={index + 1}
                 showDelete

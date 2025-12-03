@@ -3,16 +3,12 @@ import { motion } from "framer-motion";
 import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { addPlayer } from "@/lib/db";
+import { useAddPlayer } from "@/hooks/use-players";
 import { toast } from "@/hooks/use-toast";
 
-interface AddPlayerFormProps {
-  onPlayerAdded: () => void;
-}
-
-export const AddPlayerForm = ({ onPlayerAdded }: AddPlayerFormProps) => {
+export const AddPlayerForm = () => {
   const [name, setName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const addPlayerMutation = useAddPlayer();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,11 +32,9 @@ export const AddPlayerForm = ({ onPlayerAdded }: AddPlayerFormProps) => {
       return;
     }
 
-    setIsSubmitting(true);
     try {
-      await addPlayer(trimmedName);
+      await addPlayerMutation.mutateAsync(trimmedName);
       setName("");
-      onPlayerAdded();
       toast({
         title: "Player added!",
         description: `${trimmedName} has been added to the roster`,
@@ -51,8 +45,6 @@ export const AddPlayerForm = ({ onPlayerAdded }: AddPlayerFormProps) => {
         description: error instanceof Error ? error.message : "Failed to add player",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -77,8 +69,8 @@ export const AddPlayerForm = ({ onPlayerAdded }: AddPlayerFormProps) => {
           maxLength={30}
           className="flex-1"
         />
-        <Button type="submit" variant="gold" disabled={isSubmitting}>
-          {isSubmitting ? "Adding..." : "Add"}
+        <Button type="submit" variant="gold" disabled={addPlayerMutation.isPending}>
+          {addPlayerMutation.isPending ? "Adding..." : "Add"}
         </Button>
       </div>
     </motion.form>

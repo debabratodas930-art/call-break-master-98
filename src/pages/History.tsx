@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { History as HistoryIcon } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { MatchHistoryCard } from "@/components/history/MatchHistoryCard";
-import { db } from "@/lib/db";
+import { useMatches } from "@/hooks/use-matches";
 
 const History = () => {
   const matches = useLiveQuery(() => 

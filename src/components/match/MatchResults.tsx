@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Trophy, TrendingUp, TrendingDown, Medal } from "lucide-react";
-import { MatchPlayer } from "@/lib/db";
+import { MatchPlayer } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface MatchResultsProps {

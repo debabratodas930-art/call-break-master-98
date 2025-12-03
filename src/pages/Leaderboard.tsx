@@ -1,14 +1,13 @@
-import { useLiveQuery } from "dexie-react-hooks";
 import { motion } from "framer-motion";
 import { Trophy, Medal, Award } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
-import { db } from "@/lib/db";
+import { usePlayers } from "@/hooks/use-players";
 import { cn } from "@/lib/utils";
 
 const Leaderboard = () => {
-  const players = useLiveQuery(() => 
-    db.players.orderBy('rating').reverse().toArray()
-  );
+  const { data: players, isLoading } = usePlayers();
+  
+  const sortedPlayers = players?.sort((a, b) => b.rating - a.rating) ?? [];
 
   const getRankDisplay = (rank: number) => {
     switch (rank) {
@@ -60,9 +59,13 @@ const Leaderboard = () => {
           </p>
         </div>
 
-        {players && players.length > 0 ? (
+        {isLoading ? (
+          <div className="card-surface rounded-xl p-12 text-center">
+            <p className="text-muted-foreground">Loading leaderboard...</p>
+          </div>
+        ) : sortedPlayers.length > 0 ? (
           <div className="space-y-3">
-            {players.map((player, index) => {
+            {sortedPlayers.map((player, index) => {
               const rank = index + 1;
               const display = getRankDisplay(rank);
               const winRate = player.matchesPlayed > 0 
@@ -71,7 +74,7 @@ const Leaderboard = () => {
 
               return (
                 <motion.div
-                  key={player.id}
+                  key={player._id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}

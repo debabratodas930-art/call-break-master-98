@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { Trophy, Target, TrendingUp, Trash2 } from "lucide-react";
-import { Player } from "@/lib/db";
+import { Player } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface PlayerCardProps {
   player: Player;
-  onDelete?: (id: number) => void;
+  onDelete?: (id: string) => void;
   rank?: number;
   showDelete?: boolean;
 }
@@ -89,11 +89,11 @@ export const PlayerCard = ({ player, onDelete, rank, showDelete = false }: Playe
           <span className="px-2 py-1 rounded bg-rank-4/20 text-rank-4 font-medium">{player.rank4Count}</span>
         </div>
         
-        {showDelete && onDelete && player.id && (
+        {showDelete && onDelete && player._id && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => onDelete(player.id!)}
+            onClick={() => onDelete(player._id!)}
             className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
           >
             <Trash2 className="w-4 h-4" />
